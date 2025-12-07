@@ -331,6 +331,11 @@ Create a dashboard visualization of your analytics:
 
 This produces a comprehensive dashboard showing trending pages, visitor breakdown, memory efficiency, and key metrics at a glance.
 
+.. image:: /_static/images/web_analytics_dashboard.png
+   :alt: Web Analytics Dashboard
+   :align: center
+   :width: 100%
+
 Key Takeaways
 -------------
 

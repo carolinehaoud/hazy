@@ -443,6 +443,11 @@ Create a dashboard to visualize the fraud detection system performance:
 
 This visualization shows the risk distribution, detection breakdown by type, memory efficiency, and overall system performance.
 
+.. image:: /_static/images/fraud_detection_dashboard.png
+   :alt: Fraud Detection Dashboard
+   :align: center
+   :width: 100%
+
 Key Takeaways
 -------------
 

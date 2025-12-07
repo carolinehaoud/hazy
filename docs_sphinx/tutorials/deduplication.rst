@@ -408,6 +408,11 @@ Create a visualization showing the deduplication process and filter efficiency:
 
 This visualization shows how duplicates accumulate over time, the filter fill ratio, and overall deduplication efficiency.
 
+.. image:: /_static/images/deduplication_dashboard.png
+   :alt: Stream Deduplication Dashboard
+   :align: center
+   :width: 100%
+
 Best Practices
 --------------
 

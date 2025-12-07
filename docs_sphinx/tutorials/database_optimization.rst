@@ -604,6 +604,11 @@ Create a visualization comparing the performance with and without Bloom filter o
 
 This visualization shows the disk read reduction, query speedup, the Bloom filter decision flow, and overall performance gains.
 
+.. image:: /_static/images/database_optimization.png
+   :alt: Database Bloom Filter Optimization
+   :align: center
+   :width: 100%
+
 Key Takeaways
 -------------
 

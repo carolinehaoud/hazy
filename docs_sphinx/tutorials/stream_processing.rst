@@ -685,6 +685,11 @@ Create a comprehensive dashboard to visualize the stream processing metrics:
 
 This visualization provides a complete overview of the stream processing system: event distribution, top entities, memory usage, throughput, and key metrics.
 
+.. image:: /_static/images/stream_processing_dashboard.png
+   :alt: Stream Processing Dashboard
+   :align: center
+   :width: 100%
+
 Key Takeaways
 -------------
 

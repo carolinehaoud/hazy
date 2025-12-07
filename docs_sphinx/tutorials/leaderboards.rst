@@ -473,6 +473,11 @@ Create a visualization of the trending and leaderboard data:
 
 This visualization displays trending hashtags, gaming leaderboard rankings, the Zipf-like popularity distribution, and system statistics.
 
+.. image:: /_static/images/leaderboard_dashboard.png
+   :alt: Real-time Leaderboard Dashboard
+   :align: center
+   :width: 100%
+
 Key Takeaways
 -------------
 

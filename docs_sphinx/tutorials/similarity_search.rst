@@ -476,6 +476,11 @@ Create a similarity heatmap to visualize relationships between documents:
 
 This visualization shows which documents are similar through a heatmap and highlights the most similar pairs.
 
+.. image:: /_static/images/similarity_search.png
+   :alt: Document Similarity Analysis
+   :align: center
+   :width: 100%
+
 Best Practices
 --------------
 
