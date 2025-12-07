@@ -2,6 +2,20 @@
 
 A modern Python library for probabilistic data structures, implemented in Rust for maximum performance.
 
+## Why Hazy?
+
+When working with massive datasets, exact answers become expensive. Counting unique visitors across billions of events? A precise solution needs gigabytes of memory. Checking if a URL exists in a blocklist of millions? Exact lookups are slow.
+
+Probabilistic data structures solve this by trading perfect accuracy for dramatic improvements in speed and memory. A HyperLogLog can count 1 billion unique items using just 16KB of memory (with ~1% error). A Bloom filter can check membership in a set of 10 million items using 12MB instead of hundreds of megabytes.
+
+Hazy provides battle-tested implementations of these structures with a clean Python API and Rust performance. Use it when you need to:
+
+- **Count unique items** in streams too large to fit in memory
+- **Check set membership** without storing every element
+- **Estimate frequencies** of items in high-throughput streams
+- **Find similar documents** without comparing every pair
+- **Track top-K items** in real-time leaderboards
+
 ## Features
 
 - **Bloom Filter**: Space-efficient set membership testing
