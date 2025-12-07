@@ -8,13 +8,12 @@ build:
   tools:
     python: "3.11"
     rust: "1.75"
+  jobs:
+    post_install:
+      - pip install maturin
+      - maturin build --release
+      - pip install target/wheels/*.whl
+      - pip install sphinx sphinx-rtd-theme
 
 sphinx:
   configuration: docs_sphinx/conf.py
-
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
