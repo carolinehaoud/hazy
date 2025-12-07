@@ -1,0 +1,52 @@
+/* Custom CSS for Hazy documentation */
+
+/* Slightly larger code blocks */
+.highlight pre {
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* Better table styling */
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+    white-space: normal;
+}
+
+/* Code in tables */
+.wy-table-responsive table code {
+    background: #f8f8f8;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+/* Note boxes */
+.admonition.note {
+    background: #e7f2fa;
+}
+
+.admonition.warning {
+    background: #ffedcc;
+}
+
+.admonition.danger {
+    background: #fdf3f2;
+}
+
+/* Better inline code */
+code.literal {
+    background: #f5f5f5;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+/* Header styling */
+h1 {
+    border-bottom: 2px solid #2980b9;
+    padding-bottom: 0.5em;
+}
+
+/* Improve readability */
+.rst-content p {
+    line-height: 1.6;
+}

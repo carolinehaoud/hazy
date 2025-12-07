@@ -1,0 +1,89 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "hazy"
+version = "0.1.0"
+description = "A modern Python library for probabilistic data structures"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Caroline Haoud" }
+]
+keywords = [
+    "bloom-filter",
+    "hyperloglog",
+    "count-min-sketch",
+    "cuckoo-filter",
+    "probabilistic",
+    "data-structures",
+    "cardinality",
+    "streaming",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+numpy = ["numpy>=1.20"]
+viz = ["matplotlib>=3.5"]
+all = ["numpy>=1.20", "matplotlib>=3.5"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "hypothesis>=6.0",
+    "numpy>=1.20",
+    "matplotlib>=3.5",
+    "maturin>=1.4",
+    "ruff>=0.1.0",
+]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.24",
+]
+
+[project.urls]
+Homepage = "https://github.com/carolinehaoud/hazy"
+Documentation = "https://carolinehaoud.github.io/hazy"
+Repository = "https://github.com/carolinehaoud/hazy"
+Issues = "https://github.com/carolinehaoud/hazy/issues"
+
+[tool.maturin]
+python-source = "python"
+module-name = "hazy._hazy"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["hazy"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]

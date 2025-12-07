@@ -1,0 +1,27 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include pyproject.toml
+include Cargo.toml
+include Cargo.lock
+
+# Python source
+recursive-include python/hazy *.py *.pyi
+
+# Rust source
+recursive-include src *.rs
+
+# Tests
+recursive-include tests *.py
+
+# Exclude build artifacts
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.pyd
+global-exclude .DS_Store
+prune target
+prune .git
+prune docs/_build

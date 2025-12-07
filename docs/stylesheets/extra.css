@@ -1,0 +1,278 @@
+/* Custom styling for Hazy documentation */
+
+:root {
+  /* Primary brand colors */
+  --md-primary-fg-color: #6366f1;
+  --md-primary-fg-color--light: #818cf8;
+  --md-primary-fg-color--dark: #4f46e5;
+  --md-accent-fg-color: #8b5cf6;
+
+  /* Custom colors */
+  --hazy-gradient-start: #6366f1;
+  --hazy-gradient-end: #8b5cf6;
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #818cf8;
+  --md-accent-fg-color: #a78bfa;
+}
+
+/* Hero section styling */
+.md-typeset .hero {
+  text-align: center;
+  padding: 2rem 0 3rem;
+}
+
+.md-typeset .hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--hazy-gradient-start), var(--hazy-gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.md-typeset .hero .tagline {
+  font-size: 1.4rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 2rem;
+}
+
+/* Badges container */
+.md-typeset .badges {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.md-typeset .badges img {
+  height: 20px;
+}
+
+/* Feature grid */
+.md-typeset .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .grid.cards > * {
+  background: var(--md-code-bg-color);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .grid.cards > *:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.md-typeset .grid.cards h3 {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Feature icons */
+.md-typeset .feature-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Terminal/code block styling */
+.md-typeset .terminal {
+  background: #1a1b26;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.md-typeset .terminal-header {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.md-typeset .terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.md-typeset .terminal-dot.red { background: #ff5f56; }
+.md-typeset .terminal-dot.yellow { background: #ffbd2e; }
+.md-typeset .terminal-dot.green { background: #27c93f; }
+
+/* Installation tabs */
+.md-typeset .install-tabs {
+  margin: 2rem 0;
+}
+
+/* Comparison table styling */
+.md-typeset .comparison-table {
+  overflow-x: auto;
+}
+
+.md-typeset .comparison-table table {
+  white-space: nowrap;
+}
+
+.md-typeset .comparison-table th {
+  background: var(--md-primary-fg-color);
+  color: white;
+}
+
+/* Performance highlight box */
+.md-typeset .performance-box {
+  background: linear-gradient(135deg, var(--hazy-gradient-start), var(--hazy-gradient-end));
+  color: white;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .performance-box h3 {
+  color: white;
+  margin-top: 0;
+}
+
+.md-typeset .performance-box .stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.md-typeset .performance-box .stat {
+  text-align: center;
+}
+
+.md-typeset .performance-box .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.md-typeset .performance-box .stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Quick example section */
+.md-typeset .quick-example {
+  margin: 2rem 0;
+}
+
+/* Structure cards */
+.md-typeset .structure-card {
+  border-left: 4px solid var(--md-primary-fg-color);
+  padding-left: 1rem;
+  margin: 1rem 0;
+}
+
+/* API method styling */
+.md-typeset .method-signature {
+  background: var(--md-code-bg-color);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-family: var(--md-code-font-family);
+  overflow-x: auto;
+}
+
+/* Visualization placeholder images */
+.md-typeset .viz-placeholder {
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  border-radius: 0.5rem;
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+  margin: 1rem 0;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .viz-placeholder {
+  background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+  color: #999;
+}
+
+/* Announcement bar styling */
+.md-banner {
+  background: linear-gradient(90deg, var(--hazy-gradient-start), var(--hazy-gradient-end));
+}
+
+.md-banner__inner {
+  color: white;
+}
+
+/* Footer styling */
+.md-footer {
+  margin-top: 3rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 76.25em) {
+  .md-typeset .hero h1 {
+    font-size: 2.25rem;
+  }
+
+  .md-typeset .hero .tagline {
+    font-size: 1.1rem;
+  }
+
+  .md-typeset .performance-box .stats {
+    flex-direction: column;
+  }
+}
+
+/* Admonition custom styling */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: var(--md-primary-fg-color);
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* Code annotation styling */
+.md-typeset .md-annotation__index {
+  background: var(--md-primary-fg-color);
+}
+
+/* Navigation tabs styling */
+.md-tabs__link--active {
+  font-weight: 600;
+}
+
+/* Table of contents active item */
+.md-nav__link--active {
+  color: var(--md-primary-fg-color);
+  font-weight: 500;
+}
+
+/* Search highlight */
+.md-search__form {
+  border-radius: 0.5rem;
+}
+
+/* Buttons */
+.md-typeset .md-button {
+  border-radius: 0.5rem;
+}
+
+.md-typeset .md-button--primary {
+  background: linear-gradient(135deg, var(--hazy-gradient-start), var(--hazy-gradient-end));
+  border: none;
+}
+
+.md-typeset .md-button--primary:hover {
+  background: linear-gradient(135deg, var(--hazy-gradient-end), var(--hazy-gradient-start));
+}
