@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import base64
 import io
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from hazy import (

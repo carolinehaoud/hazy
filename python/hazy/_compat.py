@@ -6,7 +6,7 @@ This module handles optional imports for numpy and other dependencies.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterable, Union
+from typing import TYPE_CHECKING, Any, Union
 
 # Type checking imports (no runtime cost)
 if TYPE_CHECKING:

@@ -15,12 +15,11 @@ Example:
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Optional, Tuple, List
+from typing import TYPE_CHECKING, Any, Optional, Tuple
 
 if TYPE_CHECKING:
     from hazy import (
         BloomFilter,
-        CountingBloomFilter,
         ScalableBloomFilter,
         HyperLogLog,
         CountMinSketch,
@@ -30,8 +29,6 @@ if TYPE_CHECKING:
 
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.colors as mcolors
-    from matplotlib.patches import Rectangle
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
@@ -102,7 +99,7 @@ def plot_bloom(
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
     else:
-        fig = ax.figure
+        pass  # ax provided externally
 
     im = ax.imshow(grid, cmap=cmap, aspect='auto', interpolation='nearest')
 
@@ -517,9 +514,6 @@ def plot_scalable_bloom(
         Matplotlib axes object
     """
     _check_matplotlib()
-
-    import json
-    data = json.loads(sbf.to_bytes()[5:].decode('latin-1'))  # Skip magic/version
 
     # This won't work with bincode, need to add a method to get slice info
     # For now, show basic stats

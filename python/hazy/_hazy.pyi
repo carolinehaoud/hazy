@@ -1,6 +1,6 @@
 """Type stubs for the Rust extension module."""
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple
 
 class BloomFilter:
     """A space-efficient probabilistic data structure for set membership testing."""
