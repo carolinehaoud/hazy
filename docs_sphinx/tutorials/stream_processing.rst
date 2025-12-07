@@ -557,6 +557,134 @@ Use probabilistic structures to detect anomalies:
 
    print(f"\nTotal anomalies detected: {anomaly_count}")
 
+Visualizing Stream Processing Results
+-------------------------------------
+
+Create a comprehensive dashboard to visualize the stream processing metrics:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+
+   # Get data from the processor
+   stats = processor.get_stats()
+   memory = processor.memory_usage()
+   top_events = processor.get_top_event_types(12)
+   top_entities = processor.get_top_entities(10)
+
+   fig, axes = plt.subplots(2, 3, figsize=(16, 10))
+   fig.suptitle('Stream Processing Dashboard', fontsize=16, fontweight='bold')
+
+   # 1. Event Type Distribution (pie chart)
+   ax1 = axes[0, 0]
+   event_labels = [e for e, _ in top_events[:6]]
+   event_counts = [c for _, c in top_events[:6]]
+   other_count = sum(c for _, c in top_events[6:])
+   if other_count > 0:
+       event_labels.append('Other')
+       event_counts.append(other_count)
+   colors = plt.cm.Set3(np.linspace(0, 1, len(event_labels)))
+   ax1.pie(event_counts, labels=event_labels, colors=colors,
+           autopct='%1.1f%%', startangle=90)
+   ax1.set_title('Event Type Distribution')
+
+   # 2. Top Entities Bar Chart
+   ax2 = axes[0, 1]
+   entities = [e for e, _ in top_entities]
+   entity_counts = [c for _, c in top_entities]
+   colors = plt.cm.Blues(np.linspace(0.4, 0.9, len(entities)))
+   bars = ax2.barh(entities, entity_counts, color=colors)
+   ax2.set_xlabel('Event Count')
+   ax2.set_title('Top 10 Most Active Entities')
+   ax2.invert_yaxis()
+   for bar, count in zip(bars, entity_counts):
+       ax2.text(count + max(entity_counts)*0.01, bar.get_y() + bar.get_height()/2,
+                f'{count:,}', va='center', fontsize=9)
+
+   # 3. Memory Usage Breakdown
+   ax3 = axes[0, 2]
+   mem_components = ['HyperLogLog', 'CountMinSketch', 'TopK\n(entities)',
+                     'TopK\n(events)', 'BloomFilter', 'MinHash\nSignatures']
+   mem_sizes = [
+       memory['unique_entities_hll'] / 1024,
+       memory['event_frequencies_cms'] / 1024,
+       memory['top_entities_topk'] / 1024,
+       memory['top_events_topk'] / 1024,
+       memory['seen_entities_bloom'] / 1024,
+       memory['entity_signatures_minhash'] / 1024,
+   ]
+   colors = ['#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f39c12', '#1abc9c']
+   bars = ax3.bar(mem_components, mem_sizes, color=colors)
+   ax3.set_ylabel('Memory (KB)')
+   ax3.set_title('Memory Usage by Component')
+   ax3.tick_params(axis='x', rotation=45)
+   for bar, size in zip(bars, mem_sizes):
+       if size > 0:
+           ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                    f'{size:.1f}', ha='center', fontsize=8)
+
+   # 4. Throughput Over Time (simulated)
+   ax4 = axes[1, 0]
+   # Simulate throughput data
+   time_points = np.arange(0, 10, 0.5)
+   throughput = stats['events_per_second'] * (1 + 0.1 * np.sin(time_points))
+   ax4.fill_between(time_points, throughput, alpha=0.3, color='#3498db')
+   ax4.plot(time_points, throughput, color='#3498db', linewidth=2)
+   ax4.axhline(y=stats['events_per_second'], color='red', linestyle='--',
+               label=f"Avg: {stats['events_per_second']:,.0f}/s")
+   ax4.set_xlabel('Time (seconds)')
+   ax4.set_ylabel('Events/Second')
+   ax4.set_title('Processing Throughput')
+   ax4.legend()
+
+   # 5. First-time vs Returning Events
+   ax5 = axes[1, 1]
+   first_time = stats['first_time_entities']
+   returning = stats['total_events'] - first_time
+   sizes = [first_time, returning]
+   labels = [f'First-time\n({first_time:,})', f'Returning\n({returning:,})']
+   colors = ['#2ecc71', '#3498db']
+   explode = (0.05, 0)
+   ax5.pie(sizes, explode=explode, labels=labels, colors=colors,
+           autopct='%1.1f%%', shadow=True, startangle=90)
+   ax5.set_title('First-time vs Returning Entities')
+
+   # 6. Summary Statistics
+   ax6 = axes[1, 2]
+   ax6.axis('off')
+   summary_text = f"""
+   STREAM PROCESSING SUMMARY
+   {'─' * 38}
+
+   EVENTS PROCESSED:
+   Total Events:          {stats['total_events']:>12,}
+   Unique Entities:       {stats['unique_entities']:>12,}
+   First-time Entities:   {stats['first_time_entities']:>12,}
+
+   PERFORMANCE:
+   Processing Time:       {stats['elapsed_seconds']:>11.2f}s
+   Throughput:            {stats['events_per_second']:>10,.0f}/s
+
+   {'─' * 38}
+   MEMORY EFFICIENCY:
+   Total Memory Used:     {memory['total_bytes']/1024:.1f} KB
+                          ({memory['total_bytes']/1024/1024:.2f} MB)
+
+   Events per KB:         {stats['total_events']/(memory['total_bytes']/1024):.0f}
+   {'─' * 38}
+   Bounded memory for infinite streams!
+   """
+   ax6.text(0.05, 0.5, summary_text, fontsize=10, fontfamily='monospace',
+            verticalalignment='center', transform=ax6.transAxes,
+            bbox=dict(boxstyle='round', facecolor='lavender', alpha=0.8))
+
+   plt.tight_layout()
+   plt.savefig('stream_processing_dashboard.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This visualization provides a complete overview of the stream processing system: event distribution, top entities, memory usage, throughput, and key metrics.
+
 Key Takeaways
 -------------
 

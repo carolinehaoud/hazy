@@ -374,6 +374,108 @@ Memory Considerations
 
 For 1 million documents with 128 hashes: ~128 MB for signatures.
 
+Visualizing Document Similarity
+--------------------------------
+
+Create a similarity heatmap to visualize relationships between documents:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+   from hazy import MinHash
+   from itertools import combinations
+
+   # Sample documents
+   documents = {
+       "ML Basics": "Machine learning is a subset of artificial intelligence that learns from data",
+       "Deep Learning": "Deep learning uses neural networks to learn representations from data",
+       "AI Overview": "Artificial intelligence encompasses machine learning and other techniques",
+       "Weather Report": "The weather today is sunny with a high of 75 degrees",
+       "Climate Change": "Climate change affects global weather patterns and temperatures",
+       "Cooking Tips": "The best way to cook pasta is with salted boiling water",
+       "NLP Intro": "Natural language processing applies machine learning to text data",
+   }
+
+   doc_names = list(documents.keys())
+   n_docs = len(doc_names)
+
+   # Create MinHash signatures
+   def get_shingles(text, k=3):
+       text = text.lower()
+       return {text[i:i+k] for i in range(len(text) - k + 1)}
+
+   signatures = {}
+   for name, text in documents.items():
+       mh = MinHash(num_hashes=128)
+       mh.update(get_shingles(text))
+       signatures[name] = mh
+
+   # Compute pairwise similarities
+   similarity_matrix = np.zeros((n_docs, n_docs))
+   for i, name1 in enumerate(doc_names):
+       for j, name2 in enumerate(doc_names):
+           if i == j:
+               similarity_matrix[i, j] = 1.0
+           else:
+               similarity_matrix[i, j] = signatures[name1].jaccard(signatures[name2])
+
+   # Create visualization
+   fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+   fig.suptitle('Document Similarity Analysis', fontsize=16, fontweight='bold')
+
+   # 1. Similarity Heatmap
+   ax1 = axes[0]
+   im = ax1.imshow(similarity_matrix, cmap='YlOrRd', vmin=0, vmax=1)
+   ax1.set_xticks(range(n_docs))
+   ax1.set_yticks(range(n_docs))
+   ax1.set_xticklabels(doc_names, rotation=45, ha='right', fontsize=9)
+   ax1.set_yticklabels(doc_names, fontsize=9)
+   ax1.set_title('Pairwise Similarity Heatmap')
+
+   # Add similarity values as text
+   for i in range(n_docs):
+       for j in range(n_docs):
+           val = similarity_matrix[i, j]
+           color = 'white' if val > 0.5 else 'black'
+           ax1.text(j, i, f'{val:.2f}', ha='center', va='center',
+                   color=color, fontsize=8)
+
+   plt.colorbar(im, ax=ax1, label='Jaccard Similarity')
+
+   # 2. Similar Pairs Bar Chart
+   ax2 = axes[1]
+   pairs = []
+   for (i, name1), (j, name2) in combinations(enumerate(doc_names), 2):
+       sim = similarity_matrix[i, j]
+       pairs.append((f"{name1}\nvs\n{name2}", sim))
+
+   # Sort by similarity
+   pairs.sort(key=lambda x: x[1], reverse=True)
+   top_pairs = pairs[:8]  # Show top 8 pairs
+
+   pair_names = [p[0] for p in top_pairs]
+   similarities = [p[1] for p in top_pairs]
+   colors = plt.cm.YlOrRd([s for s in similarities])
+
+   bars = ax2.barh(range(len(top_pairs)), similarities, color=colors)
+   ax2.set_yticks(range(len(top_pairs)))
+   ax2.set_yticklabels(pair_names, fontsize=8)
+   ax2.set_xlabel('Jaccard Similarity')
+   ax2.set_title('Top Similar Document Pairs')
+   ax2.set_xlim(0, 1)
+   ax2.invert_yaxis()
+
+   for bar, sim in zip(bars, similarities):
+       ax2.text(sim + 0.02, bar.get_y() + bar.get_height()/2,
+               f'{sim:.1%}', va='center', fontsize=9)
+
+   plt.tight_layout()
+   plt.savefig('document_similarity.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This visualization shows which documents are similar through a heatmap and highlights the most similar pairs.
+
 Best Practices
 --------------
 

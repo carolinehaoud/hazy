@@ -309,6 +309,105 @@ When you need to **remove** items (e.g., allow re-processing after some time):
 
    print(f"After removal: {dedup.stats['removed']} can be re-processed")
 
+Visualizing Deduplication Performance
+-------------------------------------
+
+Create a visualization showing the deduplication process and filter efficiency:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+
+   # Run deduplication with tracking
+   dedup = StreamDeduplicator(expected_items=100_000, false_positive_rate=0.01)
+
+   # Track stats over time
+   processed_counts = []
+   unique_counts = []
+   duplicate_counts = []
+   fill_ratios = []
+
+   events = list(generate_urls(n_urls=100_000, duplicate_rate=0.35))
+   checkpoint_interval = 1000
+
+   for i, event in enumerate(events):
+       dedup.process(event)
+       if (i + 1) % checkpoint_interval == 0:
+           processed_counts.append(i + 1)
+           unique_counts.append(dedup.stats['unique'])
+           duplicate_counts.append(dedup.stats['duplicates'])
+           fill_ratios.append(dedup.seen.fill_ratio() * 100)
+
+   # Create visualization
+   fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+   fig.suptitle('Stream Deduplication Dashboard', fontsize=16, fontweight='bold')
+
+   # 1. Unique vs Duplicates over time (stacked area)
+   ax1 = axes[0, 0]
+   ax1.fill_between(processed_counts, 0, unique_counts, alpha=0.7, label='Unique', color='#2ecc71')
+   ax1.fill_between(processed_counts, unique_counts,
+                    [u + d for u, d in zip(unique_counts, duplicate_counts)],
+                    alpha=0.7, label='Duplicates', color='#e74c3c')
+   ax1.set_xlabel('Events Processed')
+   ax1.set_ylabel('Count')
+   ax1.set_title('Unique vs Duplicate Events Over Time')
+   ax1.legend(loc='upper left')
+   ax1.set_xlim(0, max(processed_counts))
+
+   # 2. Bloom Filter Fill Ratio
+   ax2 = axes[0, 1]
+   ax2.plot(processed_counts, fill_ratios, color='#3498db', linewidth=2)
+   ax2.axhline(y=50, color='#e67e22', linestyle='--', label='50% threshold')
+   ax2.fill_between(processed_counts, fill_ratios, alpha=0.3, color='#3498db')
+   ax2.set_xlabel('Events Processed')
+   ax2.set_ylabel('Fill Ratio (%)')
+   ax2.set_title('Bloom Filter Fill Ratio')
+   ax2.legend()
+   ax2.set_ylim(0, 100)
+
+   # 3. Deduplication Rate (pie chart)
+   ax3 = axes[1, 0]
+   final_stats = dedup.get_stats()
+   sizes = [final_stats['unique'], final_stats['duplicates']]
+   labels = [f"Unique\n({final_stats['unique']:,})",
+             f"Duplicates\n({final_stats['duplicates']:,})"]
+   colors = ['#2ecc71', '#e74c3c']
+   explode = (0.05, 0)
+   ax3.pie(sizes, explode=explode, labels=labels, colors=colors,
+           autopct='%1.1f%%', shadow=True, startangle=90)
+   ax3.set_title('Final Deduplication Summary')
+
+   # 4. Memory Efficiency Stats
+   ax4 = axes[1, 1]
+   ax4.axis('off')
+   stats_text = f"""
+   DEDUPLICATION PERFORMANCE
+   {'─' * 40}
+
+   Total Events Processed:    {final_stats['total_processed']:>12,}
+   Unique Events:             {final_stats['unique']:>12,}
+   Duplicates Filtered:       {final_stats['duplicates']:>12,}
+
+   Duplicate Rate:            {final_stats['duplicate_rate']:>11.1%}
+   Filter Fill Ratio:         {fill_ratios[-1]:>11.1f}%
+
+   Memory Used:               {final_stats['memory_bytes']:>10,} bytes
+                              ({final_stats['memory_bytes']/1024:.1f} KB)
+
+   {'─' * 40}
+   Events stored per byte:    {final_stats['unique'] / final_stats['memory_bytes']:.2f}
+   """
+   ax4.text(0.1, 0.5, stats_text, fontsize=11, fontfamily='monospace',
+            verticalalignment='center', transform=ax4.transAxes,
+            bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.5))
+
+   plt.tight_layout()
+   plt.savefig('deduplication_dashboard.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This visualization shows how duplicates accumulate over time, the filter fill ratio, and overall deduplication efficiency.
+
 Best Practices
 --------------
 

@@ -249,6 +249,88 @@ Step 3: Process Events and Analyze
    print(f"  TOTAL:                   {memory['total_bytes']:>10,} bytes")
    print(f"                           ({memory['total_bytes'] / 1024 / 1024:.2f} MB)")
 
+Step 4: Visualize the Results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create a dashboard visualization of your analytics:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+
+   # Create a 2x2 dashboard
+   fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+   fig.suptitle('Web Analytics Dashboard', fontsize=16, fontweight='bold')
+
+   # 1. Trending Pages (horizontal bar chart)
+   ax1 = axes[0, 0]
+   trending = analytics.get_trending(10)
+   urls = [url for url, _ in trending]
+   counts = [count for _, count in trending]
+   colors = plt.cm.Blues([(c / max(counts)) * 0.7 + 0.3 for c in counts])
+   ax1.barh(urls, counts, color=colors)
+   ax1.set_xlabel('Page Views')
+   ax1.set_title('Top 10 Trending Pages')
+   ax1.invert_yaxis()
+   for i, (url, count) in enumerate(trending):
+       ax1.text(count + max(counts) * 0.01, i, f'{count:,}', va='center', fontsize=9)
+
+   # 2. New vs Returning Visitors (pie chart)
+   ax2 = axes[0, 1]
+   stats = analytics.get_stats()
+   visitor_data = [stats['new_visitors'], stats['returning_visitors']]
+   labels = ['New Visitors', 'Returning Visitors']
+   colors = ['#66b3ff', '#99ff99']
+   explode = (0.05, 0)
+   ax2.pie(visitor_data, explode=explode, labels=labels, colors=colors,
+           autopct='%1.1f%%', shadow=True, startangle=90)
+   ax2.set_title('New vs Returning Visitors')
+
+   # 3. Memory Usage by Component (bar chart)
+   ax3 = axes[1, 0]
+   memory = analytics.memory_usage()
+   components = ['HyperLogLog', 'Count-Min\nSketch', 'TopK', 'BloomFilter']
+   sizes_kb = [
+       memory['unique_visitors_hll'] / 1024,
+       memory['page_views_cms'] / 1024,
+       memory['trending_topk'] / 1024,
+       memory['known_visitors_bloom'] / 1024
+   ]
+   colors = ['#ff9999', '#ffcc99', '#99ccff', '#cc99ff']
+   bars = ax3.bar(components, sizes_kb, color=colors)
+   ax3.set_ylabel('Memory (KB)')
+   ax3.set_title('Memory Usage by Component')
+   for bar, size in zip(bars, sizes_kb):
+       ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 5,
+                f'{size:.1f} KB', ha='center', fontsize=9)
+
+   # 4. Key Metrics Summary (text display)
+   ax4 = axes[1, 1]
+   ax4.axis('off')
+   metrics_text = f"""
+   KEY METRICS SUMMARY
+   {'─' * 35}
+
+   Total Page Views:     {stats['total_pageviews']:>12,}
+   Unique Visitors:      {stats['unique_visitors']:>12,}
+   Pages per Visitor:    {stats['pages_per_visitor']:>12.2f}
+
+   Total Memory Used:    {memory['total_bytes'] / 1024 / 1024:>10.2f} MB
+
+   {'─' * 35}
+   Memory Savings vs Exact Storage:
+   ~{(stats['total_pageviews'] * 100) / memory['total_bytes']:.0f}x compression!
+   """
+   ax4.text(0.1, 0.5, metrics_text, fontsize=12, fontfamily='monospace',
+            verticalalignment='center', transform=ax4.transAxes,
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+   plt.tight_layout()
+   plt.savefig('web_analytics_dashboard.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This produces a comprehensive dashboard showing trending pages, visitor breakdown, memory efficiency, and key metrics at a glance.
+
 Key Takeaways
 -------------
 

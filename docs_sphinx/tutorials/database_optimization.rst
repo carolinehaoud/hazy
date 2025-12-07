@@ -467,6 +467,143 @@ Bloom filters can also optimize JOIN operations:
    print(f"  Lookups avoided: {checks - lookups:,} ({(1 - lookups/checks)*100:.1f}%)")
    print(f"  Results: {len(results_bloom)}")
 
+Visualizing Database Optimization
+----------------------------------
+
+Create a visualization comparing the performance with and without Bloom filter optimization:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+
+   # Collect benchmark data (from the benchmark run)
+   # Note: These values would come from actual benchmark results
+   basic_disk_reads = 1000
+   bloom_disk_reads = 215  # ~80% reduction with 0.01 FPR + 20% existing keys
+   basic_time = 0.1  # seconds
+   bloom_time = 0.025  # seconds
+   bloom_memory = 120_000  # bytes
+
+   fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+   fig.suptitle('Database Bloom Filter Optimization', fontsize=16, fontweight='bold')
+
+   # 1. Disk Reads Comparison
+   ax1 = axes[0, 0]
+   methods = ['Without\nBloom Filter', 'With\nBloom Filter']
+   disk_reads = [basic_disk_reads, bloom_disk_reads]
+   colors = ['#e74c3c', '#2ecc71']
+   bars = ax1.bar(methods, disk_reads, color=colors, width=0.6)
+   ax1.set_ylabel('Disk Reads')
+   ax1.set_title('Disk Read Comparison (1000 queries)')
+   ax1.set_ylim(0, max(disk_reads) * 1.2)
+   for bar, reads in zip(bars, disk_reads):
+       ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 20,
+                f'{reads:,}', ha='center', fontsize=12, fontweight='bold')
+   reduction = (1 - bloom_disk_reads / basic_disk_reads) * 100
+   ax1.annotate(f'{reduction:.0f}% reduction',
+                xy=(1, bloom_disk_reads), xytext=(1.3, basic_disk_reads/2),
+                fontsize=11, color='green',
+                arrowprops=dict(arrowstyle='->', color='green'))
+
+   # 2. Query Time Comparison
+   ax2 = axes[0, 1]
+   times = [basic_time * 1000, bloom_time * 1000]  # Convert to ms
+   bars = ax2.bar(methods, times, color=colors, width=0.6)
+   ax2.set_ylabel('Time (ms)')
+   ax2.set_title('Query Time Comparison')
+   ax2.set_ylim(0, max(times) * 1.2)
+   for bar, t in zip(bars, times):
+       ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2,
+                f'{t:.1f}ms', ha='center', fontsize=12, fontweight='bold')
+   speedup = basic_time / bloom_time
+   ax2.annotate(f'{speedup:.1f}x faster',
+                xy=(1, bloom_time*1000), xytext=(1.3, basic_time*500),
+                fontsize=11, color='green',
+                arrowprops=dict(arrowstyle='->', color='green'))
+
+   # 3. Bloom Filter Decision Flow (Sankey-like visualization)
+   ax3 = axes[1, 0]
+   ax3.set_xlim(0, 10)
+   ax3.set_ylim(0, 10)
+
+   # Draw flow diagram
+   total = 1000
+   bloom_no = 785  # Bloom says "definitely not here"
+   bloom_maybe = 215  # Bloom says "might be here"
+   actual_found = 200  # Actually found
+   false_positives = 15  # Bloom false positives
+
+   # Boxes
+   ax3.add_patch(plt.Rectangle((0.5, 4), 2, 2, color='#3498db', alpha=0.8))
+   ax3.text(1.5, 5, f'Queries\n{total}', ha='center', va='center', fontsize=10, color='white')
+
+   ax3.add_patch(plt.Rectangle((4, 6.5), 2.5, 1.5, color='#2ecc71', alpha=0.8))
+   ax3.text(5.25, 7.25, f'Bloom: No\n{bloom_no}', ha='center', va='center', fontsize=9, color='white')
+
+   ax3.add_patch(plt.Rectangle((4, 2), 2.5, 1.5, color='#f39c12', alpha=0.8))
+   ax3.text(5.25, 2.75, f'Bloom: Maybe\n{bloom_maybe}', ha='center', va='center', fontsize=9, color='white')
+
+   ax3.add_patch(plt.Rectangle((7.5, 6.5), 2, 1.5, color='#27ae60', alpha=0.8))
+   ax3.text(8.5, 7.25, f'Skip Disk\n{bloom_no}', ha='center', va='center', fontsize=9, color='white')
+
+   ax3.add_patch(plt.Rectangle((7.5, 3), 2, 1.2, color='#2ecc71', alpha=0.8))
+   ax3.text(8.5, 3.6, f'Found\n{actual_found}', ha='center', va='center', fontsize=9, color='white')
+
+   ax3.add_patch(plt.Rectangle((7.5, 1.3), 2, 1.2, color='#e74c3c', alpha=0.8))
+   ax3.text(8.5, 1.9, f'FP\n{false_positives}', ha='center', va='center', fontsize=9, color='white')
+
+   # Arrows
+   ax3.annotate('', xy=(4, 7.25), xytext=(2.5, 5.5),
+                arrowprops=dict(arrowstyle='->', color='black', lw=2))
+   ax3.annotate('', xy=(4, 2.75), xytext=(2.5, 4.5),
+                arrowprops=dict(arrowstyle='->', color='black', lw=2))
+   ax3.annotate('', xy=(7.5, 7.25), xytext=(6.5, 7.25),
+                arrowprops=dict(arrowstyle='->', color='black', lw=2))
+   ax3.annotate('', xy=(7.5, 3.6), xytext=(6.5, 2.9),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
+   ax3.annotate('', xy=(7.5, 1.9), xytext=(6.5, 2.5),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
+
+   ax3.set_title('Bloom Filter Query Flow')
+   ax3.axis('off')
+
+   # 4. Performance Summary
+   ax4 = axes[1, 1]
+   ax4.axis('off')
+   summary_text = f"""
+   BLOOM FILTER OPTIMIZATION RESULTS
+   {'─' * 42}
+
+   QUERY PERFORMANCE:
+   Total Queries:              {total:>10,}
+   Disk Reads (No Bloom):      {basic_disk_reads:>10,}
+   Disk Reads (With Bloom):    {bloom_disk_reads:>10,}
+   Disk Reads Avoided:         {basic_disk_reads - bloom_disk_reads:>10,}
+
+   {'─' * 42}
+   EFFICIENCY GAINS:
+   Disk Read Reduction:        {reduction:>9.1f}%
+   Speedup Factor:             {speedup:>9.1f}x
+   False Positive Rate:              ~1.5%
+
+   MEMORY COST:
+   Bloom Filter Size:          {bloom_memory/1024:>9.1f} KB
+
+   {'─' * 42}
+   ROI: {bloom_memory/1024:.0f} KB memory saves {basic_disk_reads - bloom_disk_reads}
+        disk reads per 1000 queries
+   """
+   ax4.text(0.05, 0.5, summary_text, fontsize=10, fontfamily='monospace',
+            verticalalignment='center', transform=ax4.transAxes,
+            bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.3))
+
+   plt.tight_layout()
+   plt.savefig('database_optimization.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This visualization shows the disk read reduction, query speedup, the Bloom filter decision flow, and overall performance gains.
+
 Key Takeaways
 -------------
 

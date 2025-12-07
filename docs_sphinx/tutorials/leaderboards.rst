@@ -380,6 +380,99 @@ TopK also works great for gaming leaderboards:
    print(f"\nActive players: {stats['active_players']:,}")
    print(f"Memory used: {stats['memory_bytes']:,} bytes")
 
+Visualizing the Leaderboard
+---------------------------
+
+Create a visualization of the trending and leaderboard data:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+
+   # Create visualization
+   fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+   fig.suptitle('Real-time Leaderboard Dashboard', fontsize=16, fontweight='bold')
+
+   # 1. Trending Hashtags Bar Chart
+   ax1 = axes[0, 0]
+   trending_data = tracker.get_trending("1hour", 10)
+   tags = [tag for tag, _ in trending_data]
+   counts = [count for _, count in trending_data]
+   colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(tags)))
+   bars = ax1.barh(tags, counts, color=colors)
+   ax1.set_xlabel('Event Count')
+   ax1.set_title('Top 10 Trending Hashtags')
+   ax1.invert_yaxis()
+   for bar, count in zip(bars, counts):
+       ax1.text(count + max(counts)*0.01, bar.get_y() + bar.get_height()/2,
+                f'{count:,}', va='center', fontsize=9)
+
+   # 2. Gaming Leaderboard
+   ax2 = axes[0, 1]
+   top_players = leaderboard.get_leaderboard(10)
+   players = [p for p, _ in top_players]
+   scores = [s for _, s in top_players]
+   colors = ['#FFD700' if i == 0 else '#C0C0C0' if i == 1 else '#CD7F32' if i == 2
+             else '#3498db' for i in range(len(players))]
+   bars = ax2.barh(players, scores, color=colors)
+   ax2.set_xlabel('Total Score')
+   ax2.set_title('Gaming Leaderboard - Top 10')
+   ax2.invert_yaxis()
+   for i, (bar, score) in enumerate(zip(bars, scores)):
+       medal = ['🥇', '🥈', '🥉'][i] if i < 3 else ''
+       ax2.text(score + max(scores)*0.01, bar.get_y() + bar.get_height()/2,
+                f'{medal} {score:,}', va='center', fontsize=9)
+
+   # 3. Hashtag Popularity Distribution
+   ax3 = axes[1, 0]
+   all_trending = tracker.get_trending("1hour", 50)
+   positions = range(1, len(all_trending) + 1)
+   all_counts = [count for _, count in all_trending]
+   ax3.scatter(positions, all_counts, c=all_counts, cmap='YlOrRd', s=100, alpha=0.7)
+   ax3.plot(positions, all_counts, 'b-', alpha=0.3)
+   ax3.set_xlabel('Rank')
+   ax3.set_ylabel('Event Count')
+   ax3.set_title('Popularity Distribution (Zipf-like pattern)')
+   ax3.set_yscale('log')
+
+   # 4. Summary Statistics
+   ax4 = axes[1, 1]
+   ax4.axis('off')
+
+   game_stats = leaderboard.get_stats()
+   summary_text = f"""
+   LEADERBOARD STATISTICS
+   {'─' * 40}
+
+   TRENDING HASHTAGS:
+   Total Events:          {100_000:>12,}
+   Tracked Tags:                    50
+   Top Tag Events:        {counts[0]:>12,}
+
+   GAMING LEADERBOARD:
+   Active Players:        {game_stats['active_players']:>12,}
+   Top Score:             {scores[0]:>12,}
+   Score Gap (1st-2nd):   {scores[0]-scores[1]:>12,}
+
+   {'─' * 40}
+   MEMORY EFFICIENCY:
+   TopK Memory:           {game_stats['memory_bytes']:>10,} bytes
+   Players Tracked:                 50
+   Bytes per Player:      {game_stats['memory_bytes']//50:>10,}
+
+   Time Complexity: O(log k) per update
+   """
+   ax4.text(0.05, 0.5, summary_text, fontsize=11, fontfamily='monospace',
+            verticalalignment='center', transform=ax4.transAxes,
+            bbox=dict(boxstyle='round', facecolor='lightcyan', alpha=0.8))
+
+   plt.tight_layout()
+   plt.savefig('leaderboard_dashboard.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This visualization displays trending hashtags, gaming leaderboard rankings, the Zipf-like popularity distribution, and system statistics.
+
 Key Takeaways
 -------------
 

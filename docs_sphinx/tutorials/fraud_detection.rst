@@ -355,6 +355,94 @@ When to use which:
      - Permanent blocklists
      - Dynamic lists
 
+Visualizing Fraud Detection Results
+------------------------------------
+
+Create a dashboard to visualize the fraud detection system performance:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+
+   # Create visualization from the transaction results
+   fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+   fig.suptitle('Fraud Detection Dashboard', fontsize=16, fontweight='bold')
+
+   # 1. Risk Level Distribution (pie chart)
+   ax1 = axes[0, 0]
+   risk_counts = [results[RiskLevel.LOW], results[RiskLevel.MEDIUM],
+                  results[RiskLevel.HIGH], results[RiskLevel.BLOCKED]]
+   labels = ['Low Risk', 'Medium Risk', 'High Risk', 'Blocked']
+   colors = ['#2ecc71', '#f1c40f', '#e67e22', '#e74c3c']
+   explode = (0, 0.05, 0.1, 0.15)
+   ax1.pie(risk_counts, explode=explode, labels=labels, colors=colors,
+           autopct='%1.1f%%', shadow=True, startangle=90)
+   ax1.set_title('Transaction Risk Distribution')
+
+   # 2. Detection Type Breakdown (bar chart)
+   ax2 = axes[0, 1]
+   detection_types = ['Bad Emails', 'Suspicious IPs', 'Stolen Cards', 'Device Fraud']
+   detected_counts = [100, 100, 50, 0]  # From test data creation
+   colors = ['#3498db', '#9b59b6', '#e74c3c', '#1abc9c']
+   bars = ax2.bar(detection_types, detected_counts, color=colors)
+   ax2.set_ylabel('Transactions Flagged')
+   ax2.set_title('Fraud Detection by Type')
+   ax2.tick_params(axis='x', rotation=45)
+   for bar, count in zip(bars, detected_counts):
+       ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2,
+                str(count), ha='center', fontsize=10)
+
+   # 3. Memory Usage by Component (horizontal bar)
+   ax3 = axes[1, 0]
+   memory = detector.memory_usage()
+   components = ['Email Blocklist\n(BloomFilter)', 'IP Reputation\n(CuckooFilter)',
+                 'Card Blocklist\n(BloomFilter)', 'Device Tracking\n(CountMinSketch)']
+   sizes_kb = [memory['bad_emails']/1024, memory['suspicious_ips']/1024,
+               memory['blocked_cards']/1024, memory['device_attempts']/1024]
+   colors = ['#3498db', '#9b59b6', '#e74c3c', '#1abc9c']
+   bars = ax3.barh(components, sizes_kb, color=colors)
+   ax3.set_xlabel('Memory (KB)')
+   ax3.set_title('Memory Usage by Detection Component')
+   for bar, size in zip(bars, sizes_kb):
+       ax3.text(size + 5, bar.get_y() + bar.get_height()/2,
+                f'{size:.1f} KB', va='center', fontsize=9)
+
+   # 4. System Performance Summary
+   ax4 = axes[1, 1]
+   ax4.axis('off')
+   total_txns = sum(results.values())
+   blocked_pct = results[RiskLevel.BLOCKED] / total_txns * 100
+   flagged_pct = (results[RiskLevel.HIGH] + results[RiskLevel.BLOCKED]) / total_txns * 100
+
+   summary_text = f"""
+   FRAUD DETECTION PERFORMANCE
+   {'─' * 40}
+
+   Total Transactions:     {total_txns:>10,}
+   Low Risk (Approved):    {results[RiskLevel.LOW]:>10,}
+   Medium Risk (Review):   {results[RiskLevel.MEDIUM]:>10,}
+   High Risk (Flagged):    {results[RiskLevel.HIGH]:>10,}
+   Blocked:                {results[RiskLevel.BLOCKED]:>10,}
+
+   {'─' * 40}
+   Block Rate:             {blocked_pct:>9.1f}%
+   Total Flagged Rate:     {flagged_pct:>9.1f}%
+
+   Total Memory Usage:     {memory['total_bytes']/1024:.1f} KB
+   {'─' * 40}
+   Lookup Speed: Sub-millisecond per transaction
+   """
+   ax4.text(0.1, 0.5, summary_text, fontsize=11, fontfamily='monospace',
+            verticalalignment='center', transform=ax4.transAxes,
+            bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8))
+
+   plt.tight_layout()
+   plt.savefig('fraud_detection_dashboard.png', dpi=150, bbox_inches='tight')
+   plt.show()
+
+This visualization shows the risk distribution, detection breakdown by type, memory efficiency, and overall system performance.
+
 Key Takeaways
 -------------
 
